@@ -150,10 +150,9 @@ class ApprovalClient {
       const [result] = await this.client.LGCY_APRV_EA_TOTALAPRV_03_SOAsync(request);
       
       console.log("RECEIVED RESPONSE:", JSON.stringify(result, null, 2));
-      
-      const response = result as TotalAprvResponse;
 
-      return response.MT_LGCY_APRV_EA_TOTALAPRV_03_S_response.requestAutoResponse;
+      // 응답에서 직접 requestAutoResponse 추출
+      return result.requestAutoResponse as RequestAutoResponse[];
     } catch (error) {
       console.error('전자결재 요청 전송 중 오류 발생:', error);
       throw error;
