@@ -1,0 +1,6 @@
+url:
+  wsdl: http://localhost:8000/dir/wsdl?p=ic/3c138579239938e89d87781b6a63468c
+  endpoint: http://localhost:8000/XISOAPAdapter/MessageServlet?senderParty=&senderService=LGCY_DEV&receiverParty=&receiverService=&interface=LGCY_APRV_EA_TOTALAPRV_03_SO&interfaceNamespace=http://www.lgchem.com/APRV
+mgmt:
+  ip: 127.0.0.1
+  port: 8000

@@ -1,0 +1,4 @@
+/prototype/ts-soap/app/*
+/prototype/ts-soap/node_modules
+/prototype/ts-soap/test.wsdl
+/prototype/.DS_Store
