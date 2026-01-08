@@ -26,7 +26,7 @@ class RequestAuto {
   FILE_LINK_NAME?: string;
   FILE_LINK_URL?: string;
   FILE_SIZE?: string;
-  NEXT_APPR_TYPE: APPR_TYPE;
+  NEXT_APPR_TYPE: string;
   NEXT_APPROVER: string;
   READ_USER?: string;
   READ_DEPT?: string;
@@ -114,12 +114,14 @@ class ApprovalClient {
         wsdlSource = absoluteWsdlPath;
       }
 
+      const auth = "Basic "+ Buffer.from(`SPI_APRV_01:lgchem2016`).toString("base64")
       // SOAP 클라이언트 생성
       this.client = await soap.createClientAsync(wsdlSource, {
         endpoint: this.endpoint || undefined,
+        wsdl_headers: { Authorization: auth}
       });
 
-      this.client.setSecurity(new soap.BasicAuthSecurity('SPL_APRV_01', 'lgchem2016'));
+      this.client.setSecurity(new soap.BasicAuthSecurity('SPI_APRV_01', 'lgchem2016'));
 
       console.log('SOAP 클라이언트가 초기화되었습니다.');
     } catch (error) {
@@ -145,6 +147,7 @@ class ApprovalClient {
         },
       };
 
+      console.log("SEND REQ:" ,JSON.stringify(request))
       // SOAP 요청 전송
       const [result] = await this.client.LGCY_APRV_EA_TOTALAPRV_03_SOAsync(request);
       const response = result as TotalAprvResponse;
