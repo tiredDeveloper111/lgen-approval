@@ -141,10 +141,8 @@ class ApprovalClient {
     }
 
     try {
-      const request: TotalAprvRequest = {
-        MT_LGCY_APRV_EA_TOTALAPRV_03_S: {
-          requestAuto: requestData,
-        },
+      const request = {
+        requestAuto: requestData,
       };
 
       console.log("SEND REQ:" ,JSON.stringify(request))
