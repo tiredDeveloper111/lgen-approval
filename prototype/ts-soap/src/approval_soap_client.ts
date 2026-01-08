@@ -19,7 +19,7 @@ class RequestAuto {
   APPKEY_05?: string;
   FORM_EDITOR_DATA?: string;
   FORM_MOBILE_DATA?: string;
-  APPR_SECURITY_TYPE: number;
+  APPR_SECURITY_TYPE?: string;
   APPR_DOC_NO?: string;
   APPR_LINE_TYPE?: string;
   APPR_PERIOD_CD?: string;
