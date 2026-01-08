@@ -148,6 +148,9 @@ class ApprovalClient {
       console.log("SEND REQ:" ,JSON.stringify(request))
       // SOAP 요청 전송
       const [result] = await this.client.LGCY_APRV_EA_TOTALAPRV_03_SOAsync(request);
+      
+      console.log("RECEIVED RESPONSE:", JSON.stringify(result, null, 2));
+      
       const response = result as TotalAprvResponse;
 
       return response.MT_LGCY_APRV_EA_TOTALAPRV_03_S_response.requestAutoResponse;
