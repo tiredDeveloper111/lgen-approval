@@ -1,4 +1,4 @@
-/prototype/ts-soap/app/*
-/prototype/ts-soap/node_modules
-/prototype/ts-soap/test.wsdl
+/prototype/approval_register/app/*
+/prototype/approval_register/node_modules
+/prototype/approval_register/test.wsdl
 /prototype/.DS_Store
