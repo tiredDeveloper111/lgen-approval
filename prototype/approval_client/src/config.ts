@@ -19,7 +19,20 @@ class YmlWrapper {
 }
 
 class LoadedConfig {
-  public url: {
+  public system: {
+    system_id: string;
+    form_id: string;
+  };
+  public account: {
+    username: string;
+    password: string;
+  };
+
+  public approval_register: {
+    wsdl: string;
+    endpoint: string;
+  };
+  public approval_delegator: {
     wsdl: string;
     endpoint: string;
   };

@@ -1,6 +1,15 @@
-url:
+system:
+    system_id: 'BMIL'
+    form_id: 'BMIL-F00001'
+account:
+  username: SPI_APRV_01
+  password: lgchem2016
+approval_register:
   wsdl: http://localhost:8000/dir/wsdl?p=ic/3c138579239938e89d87781b6a63468c
   endpoint: http://localhost:8000/XISOAPAdapter/MessageServlet?senderParty=&senderService=LGCY_DEV&receiverParty=&receiverService=&interface=LGCY_APRV_EA_TOTALAPRV_03_SO&interfaceNamespace=http://www.lgchem.com/APRV
+approval_delegator:
+  wsdl: http://10.94.23.4:50000/dir/wsdl?p=ic/136dd76ea1263ead8f2c050d4c1ccdeb
+  endpoint: http://10.94.23.4:50000/XISOAPAdapter/MessageServlet?senderParty=&senderService=LGCY_DEV&receiverParty=&receiverService=&interface=LGCY_APRV_EA_TOTALAPRV_06_SO&interfaceNamespace=http://www.lgchem.com/APRV
 mgmt:
   ip: 127.0.0.1
   port: 8000

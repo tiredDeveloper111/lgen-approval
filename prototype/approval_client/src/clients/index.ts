@@ -10,12 +10,15 @@ export {
 } from './approval_register_client';
 
 // Approval Cancel Client
+export { ApprovalCancelClient, CancelRequest, CancelResponse } from './approval_cancel_client';
+
+// Approval Delegator Client
 export {
-  ApprovalCancelClient,
-  CancelRequest,
-  CancelResponse,
-} from './approval_cancel_client';
+  ApprovalDelegatorClient,
+  SetEntrustRequest,
+  SetEntrustResponse,
+  API_TYPE,
+} from './approval_delegator_client';
 
 // Client Factory
 export { SOAPClientFactory, ClientFactoryConfig } from '../client_factory';
-
