@@ -61,21 +61,9 @@ class RequestAuto {
   }
 }
 
-interface TotalAprvRequest {
-  MT_LGCY_APRV_EA_TOTALAPRV_03_S: {
-    requestAuto: RequestAuto[];
-  };
-}
-
 interface RequestAutoResponse {
   IF_STATUS?: string;
   IF_ERRMSG?: string;
-}
-
-interface TotalAprvResponse {
-  MT_LGCY_APRV_EA_TOTALAPRV_03_S_response: {
-    requestAutoResponse: RequestAutoResponse[];
-  };
 }
 
 class ApprovalClient {
@@ -114,11 +102,11 @@ class ApprovalClient {
         wsdlSource = absoluteWsdlPath;
       }
 
-      const auth = "Basic "+ Buffer.from(`SPI_APRV_01:lgchem2016`).toString("base64")
+      const auth = 'Basic ' + Buffer.from(`SPI_APRV_01:lgchem2016`).toString('base64');
       // SOAP 클라이언트 생성
       this.client = await soap.createClientAsync(wsdlSource, {
         endpoint: this.endpoint || undefined,
-        wsdl_headers: { Authorization: auth}
+        wsdl_headers: { Authorization: auth },
       });
 
       this.client.setSecurity(new soap.BasicAuthSecurity('SPI_APRV_01', 'lgchem2016'));
@@ -145,11 +133,11 @@ class ApprovalClient {
         requestAuto: requestData,
       };
 
-      console.log("SEND REQ:" ,JSON.stringify(request))
+      console.log('SEND REQ:', JSON.stringify(request));
       // SOAP 요청 전송
       const [result] = await this.client.LGCY_APRV_EA_TOTALAPRV_03_SOAsync(request);
-      
-      console.log("RECEIVED RESPONSE:", JSON.stringify(result, null, 2));
+
+      console.log('RECEIVED RESPONSE:', JSON.stringify(result, null, 2));
 
       // 응답에서 직접 requestAutoResponse 추출
       return result.requestAutoResponse as RequestAutoResponse[];

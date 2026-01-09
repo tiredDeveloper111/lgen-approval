@@ -1,4 +1,4 @@
-/prototype/approval_register/app/*
-/prototype/approval_register/node_modules
-/prototype/approval_register/test.wsdl
+/prototype/approval_client/app/*
+/prototype/approval_client/node_modules
+/prototype/approval_client/test.wsdl
 /prototype/.DS_Store

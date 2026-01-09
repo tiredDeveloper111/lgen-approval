@@ -12,7 +12,11 @@ export default defineConfig([
   },
   ...tseslint.config({
     files: ['**/*.ts', '**/*.tsx'],
-    ignores: ['dist/**/*', 'node_modules/**/*'],
+    ignores: [
+      'prototype/approval_register/app/dist/**/*',
+      'node_modules/**/*',
+      'prototype/approval_register/node_modules/**/*',
+    ],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {

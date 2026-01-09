@@ -1,0 +1,78 @@
+import { SOAPClientConfig } from './base_soap_client';
+import { ApprovalRegisterClient } from './clients/approval_register_client';
+import { ApprovalCancelClient } from './clients/approval_cancel_client';
+
+export interface ClientFactoryConfig {
+  approvalRegister: SOAPClientConfig;
+  approvalCancel?: SOAPClientConfig;
+  // 추가 클라이언트 설정...
+}
+
+/**
+ * SOAP 클라이언트 팩토리
+ * 여러 WSDL 클라이언트를 중앙에서 관리
+ */
+export class SOAPClientFactory {
+  private static instances = new Map<string, any>();
+  private config: ClientFactoryConfig;
+
+  constructor(config: ClientFactoryConfig) {
+    this.config = config;
+  }
+
+  /**
+   * 전자결재 기안 클라이언트 가져오기
+   */
+  async getApprovalRegisterClient(): Promise<ApprovalRegisterClient> {
+    const key = 'approvalRegister';
+
+    if (!SOAPClientFactory.instances.has(key)) {
+      const client = new ApprovalRegisterClient(this.config.approvalRegister);
+      await client.initialize();
+      SOAPClientFactory.instances.set(key, client);
+    }
+
+    return SOAPClientFactory.instances.get(key)!;
+  }
+
+  /**
+   * 전자결재 취소 클라이언트 가져오기
+   */
+  async getApprovalCancelClient(): Promise<ApprovalCancelClient> {
+    const key = 'approvalCancel';
+
+    if (!this.config.approvalCancel) {
+      throw new Error('ApprovalCancel 클라이언트 설정이 없습니다.');
+    }
+
+    if (!SOAPClientFactory.instances.has(key)) {
+      const client = new ApprovalCancelClient(this.config.approvalCancel);
+      await client.initialize();
+      SOAPClientFactory.instances.set(key, client);
+    }
+
+    return SOAPClientFactory.instances.get(key)!;
+  }
+
+  /**
+   * 모든 클라이언트 초기화
+   */
+  async initializeAll(): Promise<void> {
+    const tasks: Promise<any>[] = [this.getApprovalRegisterClient()];
+
+    if (this.config.approvalCancel) {
+      tasks.push(this.getApprovalCancelClient());
+    }
+
+    await Promise.all(tasks);
+    console.log('모든 SOAP 클라이언트가 초기화되었습니다.');
+  }
+
+  /**
+   * 캐시된 인스턴스 초기화
+   */
+  static clearInstances(): void {
+    SOAPClientFactory.instances.clear();
+  }
+}
+
