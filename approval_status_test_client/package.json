@@ -1,0 +1,22 @@
+{
+  "name": "approval_status_test_client",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "pretest": "yarn -s build",
+    "test": "node dist/test/test_client.js"
+  },
+  "dependencies": {
+    "soap": "^1.6.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.6",
+    "@types/soap": "^0.21.0",
+    "typescript": "^5.9.3"
+  }
+}
+
+

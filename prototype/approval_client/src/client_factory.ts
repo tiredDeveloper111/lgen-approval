@@ -1,6 +1,6 @@
 import { SOAPClientConfig } from './base_soap_client';
 import { ApprovalRegisterClient } from './clients/approval_register_client';
-import { ApprovalCancelClient } from './clients/approval_cancel_client';
+
 import { ApprovalDelegatorClient } from './clients/approval_delegator_client';
 
 export interface ClientFactoryConfig {
@@ -38,25 +38,6 @@ export class SOAPClientFactory {
   }
 
   /**
-   * 전자결재 취소 클라이언트 가져오기
-   */
-  async getApprovalCancelClient(): Promise<ApprovalCancelClient> {
-    const key = 'approvalCancel';
-
-    if (!this.config.approvalCancel) {
-      throw new Error('ApprovalCancel 클라이언트 설정이 없습니다.');
-    }
-
-    if (!SOAPClientFactory.instances.has(key)) {
-      const client = new ApprovalCancelClient(this.config.approvalCancel);
-      await client.initialize();
-      SOAPClientFactory.instances.set(key, client);
-    }
-
-    return SOAPClientFactory.instances.get(key)!;
-  }
-
-  /**
    * 전자결재 위임 클라이언트 가져오기
    */
   async getApprovalDelegatorClient(): Promise<ApprovalDelegatorClient> {
@@ -80,10 +61,6 @@ export class SOAPClientFactory {
    */
   async initializeAll(): Promise<void> {
     const tasks: Promise<any>[] = [this.getApprovalRegisterClient()];
-
-    if (this.config.approvalCancel) {
-      tasks.push(this.getApprovalCancelClient());
-    }
 
     if (this.config.approvalDelegator) {
       tasks.push(this.getApprovalDelegatorClient());

@@ -1,0 +1,21 @@
+{
+  "API_TYPE": "A02",
+  "SYSTEM_ID": "BMIL",
+  "APPKEY_01": "test-apprline-001",
+  "APPKEY_02": "",
+  "APPKEY_03": "",
+  "APPKEY_04": "",
+  "APPKEY_05": "",
+  "APPKEY_06": "",
+  "APPROVER": "FP508391",
+  "COMMENT_UTF8": "결재선 수정",
+  "COMMENT_EUCKR": "",
+  "RESULT": "APPROVE",
+  "NEXT_APPR_TYPE": "0;2;1;0;9",
+  "NEXT_APPROVER_ORDER": "부장;과장;대리;사원;본인",
+  "NEXT_APPROVER": "FP508391;FP508932;FP508933;FP508934;FP508935",
+  "READ_USER": "",
+  "APPR_DATE": "20260114150000"
+}
+
+

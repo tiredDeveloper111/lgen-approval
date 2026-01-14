@@ -1,0 +1,21 @@
+{
+  "API_TYPE": "A01",
+  "SYSTEM_ID": "BMIL",
+  "APPKEY_01": "test-reject-001",
+  "APPKEY_02": "",
+  "APPKEY_03": "",
+  "APPKEY_04": "",
+  "APPKEY_05": "",
+  "APPKEY_06": "",
+  "APPROVER": "FP508391",
+  "COMMENT_UTF8": "수정이 필요합니다.",
+  "COMMENT_EUCKR": "",
+  "RESULT": "REJECT",
+  "NEXT_APPR_TYPE": "",
+  "NEXT_APPROVER_ORDER": "",
+  "NEXT_APPROVER": "",
+  "READ_USER": "",
+  "APPR_DATE": "20260114150000"
+}
+
+

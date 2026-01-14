@@ -1,0 +1,14 @@
+system:
+  system_id: 'BMIL'
+  form_id: 'BMIL-F00001'
+server:
+  host: 0.0.0.0
+  port: 8081
+vsmgmt:
+  host: 127.0.0.1
+  port: 8000
+vshr:
+  host: 127.0.0.1
+  port: 8100
+wsdl:
+  path: ./approval_status.wsdl
