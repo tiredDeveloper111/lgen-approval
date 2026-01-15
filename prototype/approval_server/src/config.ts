@@ -16,7 +16,6 @@ class YmlWrapper {
 class LoadedConfig {
   public system: {
     system_id: string;
-    form_id: String;
   };
   public server: {
     port: number;

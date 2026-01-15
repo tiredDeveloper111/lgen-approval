@@ -1,6 +1,6 @@
 system:
-  system_id: 'BMIL'
-  form_id: 'BMIL-F00001'
+  # 결재시스템의 system id (법인마다 구분 필요 일단 테스트서버는 BMIL로 등록됨)
+  system_id: 'BMIL' 
 server:
   host: 0.0.0.0
   port: 8081
