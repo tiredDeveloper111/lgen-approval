@@ -18,6 +18,7 @@ export default defineConfig([
       'node_modules/**/*',
       'prototype/approval_client/node_modules/**/*',
       'prototype/approval_server/node_modules/**/*',
+      './logger_config.js',
     ],
     languageOptions: {
       parser: tseslint.parser,

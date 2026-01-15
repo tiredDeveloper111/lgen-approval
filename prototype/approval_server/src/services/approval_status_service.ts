@@ -8,21 +8,24 @@ import {
 } from '../types/approval_status_types';
 import { VshrClient } from './vshr_client';
 import { ProcessResultReq, VsmgmtClient } from './vsmgmt_client';
+import winston from 'winston';
+import { Logger } from '../logger_decorator';
 /**
  * 결재상태 처리 서비스
  */
 export class ApprovalStatusService {
+  @Logger('VSFAccessKeySync')
+  private readonly logger: winston.Logger;
   constructor(
     private readonly vshrClient: VshrClient,
     private readonly vsmgmtClient: VsmgmtClient,
-    private readonly logger: Console,
   ) {}
   /**
    * 결재상태 처리 메인 핸들러
    */
   async processApprovalStatus(request: ApprovalStatusRequest): Promise<ApprovalStatusResponse> {
-    this.logger.log('\n=== 결재상태 처리 요청 수신 ===');
-    this.logger.log(JSON.stringify(request, null, 2));
+    this.logger.info('\n=== 결재상태 처리 요청 수신 ===');
+    this.logger.info(JSON.stringify(request, null, 2));
 
     try {
       // 요청 유효성 검증
@@ -56,7 +59,6 @@ export class ApprovalStatusService {
   ): Promise<ApprovalStatusResponse> {
     const userInfo = await this.vshrClient.getUserFromEmpCode(request.APPROVER.split(';'));
 
-    console.log(JSON.stringify(userInfo));
     if (!userInfo.success) {
       throw new Error(`결재자 ${request.APPROVER}의 정보가 존재하지 않습니다.`);
     }

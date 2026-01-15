@@ -1,11 +1,15 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import QueryString from 'qs';
+import winston from 'winston';
+import { Logger } from '../logger_decorator';
 
 export class AxiosWrapper {
+  @Logger('AxiosWrapper')
+  private readonly logger: winston.Logger;
   private readonly request: AxiosInstance;
 
-  constructor(private readonly logger: Console) {
+  constructor() {
     this.request = axios.create({
       timeout: 3 * 1000,
       paramsSerializer: (params) => QueryString.stringify(params),
@@ -40,9 +44,8 @@ export class AxiosWrapper {
       const startTime = new Date().getTime();
 
       const result = await this.request[method]<T>(args[0], args[1], args[2]);
-      this.logger.log(
+      this.logger.info(
         `Request to ${method.toUpperCase()} ${args[0]} status: ${result.status}, ${new Date().getTime() - startTime}ms`,
-        AxiosWrapper.name,
       );
 
       return result;
@@ -60,8 +63,8 @@ export class AxiosWrapper {
     const logMsg = `${requestedAPI} ${message}`;
 
     !response?.status || response.status >= 500
-      ? this.logger.error(logMsg, err.stack || err, AxiosWrapper.name)
-      : this.logger.warn(logMsg, AxiosWrapper.name);
+      ? this.logger.error(`${logMsg} %s`, err.stack || err)
+      : this.logger.info(logMsg);
 
     return err.response as AxiosResponse<any, any>;
   }

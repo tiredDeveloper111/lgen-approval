@@ -1,5 +1,6 @@
 import fs from 'fs';
 import YAML from 'yaml';
+import { LoggerFactory } from './logger';
 
 class YmlWrapper {
   public static loadYml<T>(ymlpath: string) {
@@ -37,14 +38,15 @@ class LoadedConfig {
 export class Config {
   private static configPath = process.env.CONFIG_PATH || './config.yaml';
   private static loadedConfig: LoadedConfig;
+  private static logger = LoggerFactory.getLogger('Config');
 
   public static reload() {
     try {
       this.loadedConfig = YmlWrapper.loadYml(this.configPath);
 
-      console.log('Success reload config.');
+      this.logger.info('Succes reload config %s %s', this.configPath, this.loadedConfig.wsdl);
     } catch (e) {
-      console.error('Fail to reload config...', (e as Error).stack || e);
+      this.logger.error('Fail to reload config... %s', (e as Error).stack || e);
     }
   }
 

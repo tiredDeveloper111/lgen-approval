@@ -21,8 +21,6 @@ export class VsmgmtClient {
 
     const res = await this.axiosWrapper.post(url, req);
 
-    console.log(res);
-
     if (res.status !== 200) {
       throw new Error(`Fail to post process result to vsmgmt`);
     }

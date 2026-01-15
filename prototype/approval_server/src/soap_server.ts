@@ -4,17 +4,22 @@ import * as fs from 'fs';
 import * as http from 'http';
 import { ApprovalStatusService } from './services/approval_status_service';
 import { ProcessApprovalStatusArgs } from './types/approval_status_types';
+import { Logger } from './logger_decorator';
+import winston from 'winston';
 
 /**
  * SOAP 서버 설정 및 실행
  */
 export class SOAPServer {
+  @Logger('SOAPServer')
+  private readonly logger: winston.Logger;
   private server: http.Server | null = null;
 
   constructor(
     private readonly wsdlPath: string,
     private readonly port: number,
     private readonly service: ApprovalStatusService,
+    private readonly host: string = '0.0.0.0',
   ) {}
 
   /**
@@ -25,22 +30,22 @@ export class SOAPServer {
       ApprovalStatusService: {
         ApprovalStatusPort: {
           processApprovalStatus: async (args: ProcessApprovalStatusArgs) => {
-            console.log('\n========================================');
-            console.log('SOAP 요청 수신');
-            console.log('========================================');
+            this.logger.info('\n========================================');
+            this.logger.info('SOAP 요청 수신');
+            this.logger.info('========================================');
 
             try {
               const request = args.processApprovalStatus;
               const response = await this.service.processApprovalStatus(request);
 
-              console.log('\n응답 데이터:');
-              console.log(JSON.stringify(response, null, 2));
-              console.log('========================================\n');
+              this.logger.info('\n응답 데이터:');
+              this.logger.info(JSON.stringify(response, null, 2));
+              this.logger.info('========================================\n');
 
               // 1 depth 응답 구조로 반환
               return response;
             } catch (error) {
-              console.error('SOAP 요청 처리 중 오류:', error);
+              this.logger.error('SOAP 요청 처리 중 오류:', error);
               return {
                 IF_STATUS: 'E',
                 IF_ERRMSG: error instanceof Error ? error.message : '알 수 없는 오류',
@@ -106,17 +111,18 @@ export class SOAPServer {
       soap.listen(this.server, '/approval-status', serviceDefinition, wsdlXml);
 
       // 서버 시작
-      this.server.listen(this.port, () => {
-        console.log('========================================');
-        console.log('🚀 SOAP 서버가 시작되었습니다!');
-        console.log('========================================');
-        console.log(`포트: ${this.port}`);
-        console.log(`WSDL: http://localhost:${this.port}/approval-status?wsdl`);
-        console.log(`Endpoint: http://localhost:${this.port}/approval-status`);
-        console.log('========================================\n');
+      this.server.listen(this.port, this.host, () => {
+        this.logger.info('========================================');
+        this.logger.info(' SOAP 서버가 시작되었습니다!');
+        this.logger.info('========================================');
+        this.logger.info(`호스트: ${this.host}`);
+        this.logger.info(`포트: ${this.port}`);
+        this.logger.info(`WSDL: http://localhost:${this.port}/approval-status?wsdl`);
+        this.logger.info(`Endpoint: http://localhost:${this.port}/approval-status`);
+        this.logger.info('========================================\n');
       });
     } catch (error) {
-      console.error('SOAP 서버 시작 중 오류 발생:', error);
+      this.logger.error('SOAP 서버 시작 중 오류 발생:', error);
       throw error;
     }
   }
@@ -131,7 +137,7 @@ export class SOAPServer {
           if (err) {
             reject(err);
           } else {
-            console.log('SOAP 서버가 중지되었습니다.');
+            this.logger.info('SOAP 서버가 중지되었습니다.');
             resolve();
           }
         });
