@@ -17,7 +17,8 @@ export class SOAPServer {
 
   constructor(
     private readonly wsdlPath: string,
-    private readonly port: number,
+    private readonly listen_port: number,
+    private readonly service_port: number,
     private readonly service: ApprovalStatusService,
     private readonly host: string = '0.0.0.0',
   ) {}
@@ -68,7 +69,8 @@ export class SOAPServer {
       }
 
       // WSDL 파일 읽기
-      const wsdlXml = fs.readFileSync(this.wsdlPath, 'utf8');
+      let wsdlXml = fs.readFileSync(this.wsdlPath, 'utf8');
+      wsdlXml = wsdlXml.replace('{{server}}', `${this.host}:${this.service_port}`);
 
       // HTTP 서버 생성
       const app = (req: http.IncomingMessage, res: http.ServerResponse) => {
@@ -111,14 +113,12 @@ export class SOAPServer {
       soap.listen(this.server, '/approval-status', serviceDefinition, wsdlXml);
 
       // 서버 시작
-      this.server.listen(this.port, this.host, () => {
+      this.server.listen(this.listen_port, () => {
         this.logger.info('========================================');
-        this.logger.info(' SOAP 서버가 시작되었습니다!');
+        this.logger.info(` SOAP 서버가 시작되었습니다! LISTEN: ${this.listen_port}`);
         this.logger.info('========================================');
-        this.logger.info(`호스트: ${this.host}`);
-        this.logger.info(`포트: ${this.port}`);
-        this.logger.info(`WSDL: http://localhost:${this.port}/approval-status?wsdl`);
-        this.logger.info(`Endpoint: http://localhost:${this.port}/approval-status`);
+        this.logger.info(`WSDL: http://${this.host}:${this.service_port}/approval-status?wsdl`);
+        this.logger.info(`Endpoint: http://${this.host}:${this.service_port}/approval-status`);
         this.logger.info('========================================\n');
       });
     } catch (error) {

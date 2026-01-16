@@ -19,7 +19,8 @@ class LoadedConfig {
     system_id: string;
   };
   public server: {
-    port: number;
+    service_port: number;
+    listen_port: number;
     host: string;
   };
   public vsmgmt: {

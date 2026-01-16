@@ -24,7 +24,13 @@ async function main() {
   const vsmgmtClient = new VsmgmtClient(requestor);
 
   const service = new ApprovalStatusService(vshrClient, vsmgmtClient);
-  const server = new SOAPServer(wsdlPath, config.server.port, service, config.server.host);
+  const server = new SOAPServer(
+    wsdlPath,
+    config.server.listen_port,
+    config.server.service_port,
+    service,
+    config.server.host,
+  );
 
   ConfigReloader.start();
   await server.start();

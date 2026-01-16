@@ -1,6 +1,6 @@
 system:
-    system_id: 'BMIL'
-    form_id: 'BMIL-F00001'
+  system_id: 'BMIL'
+  form_id: 'BMIL-F00001'
 account:
   username: SPI_APRV_01
   password: lgchem2016

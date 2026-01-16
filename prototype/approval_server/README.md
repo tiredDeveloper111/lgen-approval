@@ -216,3 +216,59 @@ console.log(response2);
 
 MIT
 
+## 구성 정리
+
+### 구성 1.
+결재시스템 -> approval-server 직접 접근 가능 (방화벽 오픈)
+
+### 구성 2.
+결재시스템 -> sockshub -> web ->approval-server 직접 접근 불가 
+
+> 두 구성을 둘 다 지원하기 위해 service_port라는 설정 추가
+
+### lgen-approval-server 구성방법
+1. curl -k https://deploy.somansa.com/resources/vdib/lgen-approval-server/setup.sh | bash -
+2. cd /somansa/lgen-approval-server
+3. config.yaml 값 구성에 맞게 수정
+4. docker compose up -d
+
+### 구성 2의 경우 web 설정
+```
+# 추가
+upstream approval_server {        
+    server 127.0.0.1:8081;              
+    keepalive 1000;                                                                                               
+    keepalive_timeout 30s;            
+}  
+
+server {
+    ...
+    # 추가
+    location /approval-status {
+        proxy_pass http://approval_server;
+        
+        # SOAP 필수 헤더 설정
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # SOAP 특성상 큰 페이로드 허용
+        client_max_body_size 10M;
+        
+        # 타임아웃 설정
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+        
+        # 버퍼링 설정
+        proxy_buffering on;
+        proxy_buffer_size 4k;
+        proxy_buffers 8 4k;
+        
+        # HTTP/1.1 지원 및 Connection 헤더
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
+}
+```

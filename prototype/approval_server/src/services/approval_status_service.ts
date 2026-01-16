@@ -1,4 +1,5 @@
 import moment from 'moment';
+import iconv from 'iconv-lite';
 import { Config } from '../config';
 import {
   API_TYPE,
@@ -70,7 +71,7 @@ export class ApprovalStatusService {
       approverId: approver.id,
       apprDate: moment(request.APPR_DATE, 'YYYYMMDDHHmmss').format('YYYY-MM-DD HH:mm:ss'),
       approverName: approver.name,
-      comment: request.COMMENT_EUCKR || request.COMMENT_UTF8,
+      comment: this.parseComment(request),
       result: request.RESULT,
     };
 
@@ -122,6 +123,48 @@ export class ApprovalStatusService {
       throw new Error(
         `SYSTEM ID가 일치하지 않습니다: ${config.system.system_id}/${request.SYSTEM_ID}`,
       );
+    }
+  }
+
+  /**
+   * 코멘트 파싱 (EUC-KR 또는 UTF-8)
+   */
+  private parseComment(request: ApprovalStatusRequest): string {
+    // 1. COMMENT_UTF8이 있으면 우선 사용
+    if (request.COMMENT_UTF8) {
+      return request.COMMENT_UTF8;
+    }
+
+    // 2. COMMENT_EUCKR 처리
+    if (request.COMMENT_EUCKR) {
+      try {
+        // Base64로 인코딩된 EUC-KR인지 확인
+        if (this.isBase64(request.COMMENT_EUCKR)) {
+          const buffer = Buffer.from(request.COMMENT_EUCKR, 'base64');
+          return iconv.decode(buffer, 'euc-kr');
+        }
+
+        // 이미 디코딩된 문자열이면 그대로 사용
+        return request.COMMENT_EUCKR;
+      } catch (error) {
+        this.logger.error('COMMENT_EUCKR 파싱 실패:', error);
+        return request.COMMENT_EUCKR; // fallback
+      }
+    }
+
+    // 코멘트가 없는 경우 빈 문자열 반환
+    return '';
+  }
+
+  /**
+   * Base64 문자열인지 확인
+   */
+  private isBase64(str: string): boolean {
+    if (!str || str.length === 0) return false;
+    try {
+      return Buffer.from(str, 'base64').toString('base64') === str;
+    } catch {
+      return false;
     }
   }
 

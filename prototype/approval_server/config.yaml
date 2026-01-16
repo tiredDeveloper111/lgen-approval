@@ -2,13 +2,23 @@ system:
   # 결재시스템의 system id (법인마다 구분 필요 일단 테스트서버는 BMIL로 등록됨)
   system_id: 'BMIL' 
 server:
-  host: 0.0.0.0
-  port: 8081
-vsmgmt:
+  # AP 서버 IP
   host: 127.0.0.1
+  # approval-server 띄울 포트
+  listen_port: 8081
+  # soap client (결재시스템)이 외부에서 서비스를 이용할 포트
+  # 가령 soap client - 8081-> approval-server 직접 접근이 가능하다면 service_port는 listen_port와 같은 값
+  # soap client - 80 -> sockshub -> web -> approval-server 로 접근한다면 80이 service_port에 들어가야함.
+  service_port: 8081
+vsmgmt:
+  # vsmgmt IP
+  host: 127.0.0.1
+  # vsmgmt port
   port: 8000
 vshr:
+  # vshr ip
   host: 127.0.0.1
+  # vshr port
   port: 8100
 wsdl:
   path: ./approval_status.wsdl
