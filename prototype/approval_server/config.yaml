@@ -1,7 +1,10 @@
 system:
   # 결재시스템의 system id (법인마다 구분 필요 일단 테스트서버는 BMIL로 등록됨)
   system_id: 'BMIL' 
-server:
+  form_id: 'BMIL-F00001'
+
+# 결재시스템 -> 소만사 결재처리 요청
+approval_server:
   # AP 서버 IP
   host: 127.0.0.1
   # approval-server 띄울 포트
@@ -10,6 +13,19 @@ server:
   # 가령 soap client - 8081-> approval-server 직접 접근이 가능하다면 service_port는 listen_port와 같은 값
   # soap client - 80 -> sockshub -> web -> approval-server 로 접근한다면 80이 service_port에 들어가야함.
   service_port: 8081
+  wsdl_path: ./approval_status.wsdl
+# 소만사 -> 결재시스템 결재등록 요청 
+approval_client:
+  # 등록 주기(분)
+  sync_cycle_min: 1
+  # 결재시스템 접근 계정
+  username: SPI_APRV_01
+  password: lgchem2016
+  # 결재등록
+  register: 
+    wsdl: ./register.wsdl
+    endpoint: http://localhost:8000/XISOAPAdapter/MessageServlet?senderParty=&senderService=LGCY_DEV&receiverParty=&receiverService=&interface=LGCY_APRV_EA_TOTALAPRV_03_SO&interfaceNamespace=http://www.lgchem.com/APRV
+ 
 vsmgmt:
   # vsmgmt IP
   host: 127.0.0.1
@@ -20,5 +36,3 @@ vshr:
   host: 127.0.0.1
   # vshr port
   port: 8100
-wsdl:
-  path: ./approval_status.wsdl

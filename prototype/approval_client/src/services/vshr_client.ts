@@ -30,15 +30,4 @@ export class VshrClient {
 
     return res.data;
   }
-  public async getUserFromId(ids: string[]): Promise<UserInfoResponse> {
-    const vshrConfig = Config.getConfig().vshr;
-    const uri = `/vshr/employee`;
-    const query = encodeURIComponent(`{"id":${JSON.stringify(ids)}}`);
-    const encoded_uri = `?filter=${query}`;
-    const url = `http://${vshrConfig.host}:${vshrConfig.port}${uri}${encoded_uri}`;
-
-    const res = await this.axiosWrapper.get<UserInfoResponse>(url);
-
-    return res.data;
-  }
 }

@@ -37,8 +37,13 @@ class LoadedConfig {
     endpoint: string;
   };
 
-  public mgmt: {
-    ip: string;
+  public vsmgmt: {
+    host: string;
+    port: string;
+  };
+
+  public vshr: {
+    host: string;
     port: string;
   };
 }

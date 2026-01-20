@@ -10,7 +10,8 @@
     "outDir": "app/dist",
     "rootDir": "./src",
     "declaration": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "app/dist"]

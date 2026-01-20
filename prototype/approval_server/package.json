@@ -12,9 +12,11 @@
     "format": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {
+    "@types/lodash": "^4.17.23",
     "@types/qs": "^6.14.0",
     "@types/soap": "^0.21.0",
     "iconv-lite": "^0.7.2",
+    "lodash": "^4.17.21",
     "moment": "^2.30.1",
     "qs": "^6.14.1",
     "soap": "^1.6.3",

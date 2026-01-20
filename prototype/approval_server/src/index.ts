@@ -1,11 +1,13 @@
 import { SOAPServer } from './soap_server';
-import { Config, ConfigReloader } from './config';
+import { Config } from './config';
 import path from 'path';
 import { ApprovalStatusService } from './services/approval_status_service';
 import { VshrClient } from './services/vshr_client';
 import { AxiosWrapper } from './services/axios_wrapper';
 import { VsmgmtClient } from './services/vsmgmt_client';
 import { LoggerFactory } from './logger';
+import { ApprovalSyncScheduler } from './services/approval_sync_scheduler';
+import { SOAPClientFactory } from './services/soap_clients';
 
 const logger = LoggerFactory.getLogger('MAIN');
 async function main() {
@@ -14,9 +16,9 @@ async function main() {
   // 설정 로드
   const config = Config.getConfig();
 
+  // 서버
   // WSDL 파일 경로
-  const wsdlPath = path.resolve(process.cwd(), config.wsdl.path);
-
+  const wsdlPath = path.resolve(process.cwd(), config.approval_server.wsdl_path);
   // SOAP 서버 생성 및 시작
   const requestor = new AxiosWrapper();
 
@@ -26,13 +28,28 @@ async function main() {
   const service = new ApprovalStatusService(vshrClient, vsmgmtClient);
   const server = new SOAPServer(
     wsdlPath,
-    config.server.listen_port,
-    config.server.service_port,
+    config.approval_server.listen_port,
+    config.approval_server.service_port,
     service,
-    config.server.host,
+    config.approval_server.host,
   );
 
-  ConfigReloader.start();
+  // 클라이언트
+
+  const factory = new SOAPClientFactory({
+    approvalRegister: {
+      wsdlPathOrUrl: config.approval_client.register.wsdl,
+      endpoint: config.approval_client.register.endpoint,
+      username: config.approval_client.username,
+      password: config.approval_client.password,
+    },
+  });
+
+  const registerClient = await factory.getApprovalRegisterClient();
+  const scheduler = new ApprovalSyncScheduler(vshrClient, vsmgmtClient, registerClient);
+
+  scheduler.start().catch((e) => logger.error('Unexpected error %s', e.stack || e));
+
   await server.start();
 
   // 종료 시그널 처리

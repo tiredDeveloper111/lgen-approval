@@ -17,11 +17,26 @@ class YmlWrapper {
 class LoadedConfig {
   public system: {
     system_id: string;
+    form_id: string;
   };
-  public server: {
-    service_port: number;
-    listen_port: number;
+  public approval_server: {
     host: string;
+    listen_port: number;
+    service_port: number;
+    wsdl_path: string;
+  };
+  public approval_client: {
+    sync_cycle_min: number;
+    username: string;
+    password: string;
+    register: {
+      wsdl: string;
+      endpoint: string;
+    };
+    delegator: {
+      wsdl: string;
+      endpoint: string;
+    };
   };
   public vsmgmt: {
     host: string;
@@ -30,9 +45,6 @@ class LoadedConfig {
   public vshr: {
     host: string;
     port: number;
-  };
-  public wsdl: {
-    path: string;
   };
 }
 
@@ -45,7 +57,7 @@ export class Config {
     try {
       this.loadedConfig = YmlWrapper.loadYml(this.configPath);
 
-      this.logger.info('Succes reload config %s %s', this.configPath, this.loadedConfig.wsdl);
+      this.logger.info('Succes reload config %s', this.configPath);
     } catch (e) {
       this.logger.error('Fail to reload config... %s', (e as Error).stack || e);
     }
