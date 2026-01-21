@@ -14,7 +14,7 @@ class YmlWrapper {
   }
 }
 
-class LoadedConfig {
+export class LoadedConfig {
   public system: {
     system_id: string;
     form_id: string;

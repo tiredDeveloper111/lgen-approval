@@ -67,7 +67,6 @@ export class SOAPClientFactory {
     }
 
     await Promise.all(tasks);
-    console.log('모든 SOAP 클라이언트가 초기화되었습니다.');
   }
 
   /**

@@ -67,16 +67,16 @@ export class ApprovalRegisterClient extends BaseSOAPClient<RequestAuto[], Reques
         requestAuto: requestData,
       };
 
-      console.log(`[${this.getClientName()}] 요청:`, JSON.stringify(request));
+      this.logger.info(`[${this.getClientName()}] 요청:`, JSON.stringify(request));
 
       // SOAP 메서드 호출
       const [result] = await this.client!.LGCY_APRV_EA_TOTALAPRV_03_SOAsync(request);
 
-      console.log(`[${this.getClientName()}] 응답:`, JSON.stringify(result, null, 2));
+      this.logger.info(`[${this.getClientName()}] 응답:`, JSON.stringify(result, null, 2));
 
       return result.requestAutoResponse as RequestAutoResponse[];
     } catch (error) {
-      console.error(`[${this.getClientName()}] 요청 전송 중 오류:`, error);
+      this.logger.error(`[${this.getClientName()}] 요청 전송 중 오류:`, error);
       throw error;
     }
   }

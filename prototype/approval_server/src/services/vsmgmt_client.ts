@@ -23,7 +23,7 @@ class VdContents {
 }
 export type ResetVdContents = VdContents;
 
-export type DeleteVdContents = Required<VdContents>;
+export type DeleteVdContents = VdContents;
 
 export class ExternalNetContents {
   userId: string;
@@ -48,17 +48,17 @@ export class CreateVdContents {
 }
 
 export class WatingApprovalRes {
-  id: string; // 서비스 신청 id
-  type: string;
-  applicant: string; // 신청자
-  applicantName: string; // 신청자 이름
-  user: string; // 사용자
-  userName: string; // 사용자 이름
-  userOrganization: string; // 사용자 부서
-  reason: string; // 신청 사유
-  contents: ResetVdContents | DeleteVdContents | ExternalNetContents | CreateVdContents;
-  jobScheduleDate: string;
-  apprLine: Array<{ level: number; approverId: string }>;
+  public id: string; // 서비스 신청 id
+  public type: string;
+  public applicant: string; // 신청자
+  public applicantName: string; // 신청자 이름
+  public user: string; // 사용자
+  public userName: string; // 사용자 이름
+  public userOrganization: string; // 사용자 부서
+  public reason: string; // 신청 사유
+  public contents: ResetVdContents | DeleteVdContents | ExternalNetContents | CreateVdContents;
+  public jobScheduleDate: string;
+  public apprLine: Array<{ level: number; approverId: string }>;
 }
 
 export class VsmgmtClient {

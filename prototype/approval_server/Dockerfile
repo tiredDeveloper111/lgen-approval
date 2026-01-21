@@ -39,6 +39,7 @@ WORKDIR /
 RUN mkdir /approval_server
 
 
+RUN mv /build/html /approval_server/html
 RUN mv /build/app/dist /approval_server/src
 RUN mv /build/node_modules /approval_server
 RUN mv /build/package.json /approval_server/package.json

@@ -1,13 +1,13 @@
-import { SOAPServer } from './soap_server';
-import { Config } from './config';
 import path from 'path';
-import { ApprovalStatusService } from './services/approval_status_service';
-import { VshrClient } from './services/vshr_client';
-import { AxiosWrapper } from './services/axios_wrapper';
-import { VsmgmtClient } from './services/vsmgmt_client';
+import { Config } from './config';
 import { LoggerFactory } from './logger';
+import { ApprovalStatusService } from './services/approval_status_service';
 import { ApprovalSyncScheduler } from './services/approval_sync_scheduler';
+import { AxiosWrapper } from './services/axios_wrapper';
 import { SOAPClientFactory } from './services/soap_clients';
+import { VshrClient } from './services/vshr_client';
+import { VsmgmtClient } from './services/vsmgmt_client';
+import { SOAPServer } from './soap_server';
 
 const logger = LoggerFactory.getLogger('MAIN');
 async function main() {

@@ -2,7 +2,7 @@ services:
   approval_server:
     hostname: approval_server
     container_name: approval_server
-    image: docker.lab.somansa.com/dev-test/lgen-approval-server:dev
+    image: docker.lab.somansa.com/lgen-approval-server:latest
     restart: always
     environment:
       NODE_ENV: "dev"

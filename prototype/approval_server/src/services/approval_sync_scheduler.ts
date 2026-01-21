@@ -1,10 +1,11 @@
 import winston from 'winston';
 import { Logger } from '../logger_decorator';
-import { VshrClient } from './vshr_client';
-import { VsmgmtClient } from './vsmgmt_client';
+import { UserInfo, VshrClient } from './vshr_client';
+import { VsmgmtClient, WatingApprovalRes } from './vsmgmt_client';
 import { APPR_TYPE, ApprovalRegisterClient, RequestAuto } from './soap_clients';
-import { Config } from '../config';
+import { Config, LoadedConfig } from '../config';
 import _ from 'lodash';
+import { HtmlContentsBuilder } from './html_contents_builder';
 
 export class ApprovalSyncScheduler {
   @Logger('ApprovalSyncScheduler')
@@ -34,8 +35,8 @@ export class ApprovalSyncScheduler {
     }
   }
 
-  private async processSyncCycle(config: any) {
-    const approvals = await this.fetchWaitingApprovals(config);
+  private async processSyncCycle(config: LoadedConfig) {
+    const approvals = await this.fetchWaitingApprovals(config.approval_client.sync_cycle_min);
 
     if (!approvals.length) {
       this.logger.info('Not exist sync approval target');
@@ -45,17 +46,17 @@ export class ApprovalSyncScheduler {
     const hrUserList = await this.fetchUserInfoFromHR(approvals);
     const requestDtoList = this.buildRequestDtoList(approvals, hrUserList.data, config);
 
-    this.logger.debug('Send req list %s', JSON.stringify(requestDtoList));
     if (requestDtoList.length) {
       await this.soap_register_client.execute(requestDtoList);
+      this.logger.info('Success send request... list %s', JSON.stringify(requestDtoList));
     }
   }
 
-  private async fetchWaitingApprovals(config: any) {
-    return this.vsmgmt_client.getWaitingApprovalByCycle(config.approval_client.sync_cycle_min);
+  private async fetchWaitingApprovals(cycle: number) {
+    return this.vsmgmt_client.getWaitingApprovalByCycle(cycle);
   }
 
-  private async fetchUserInfoFromHR(approvals: any[]) {
+  private async fetchUserInfoFromHR(approvals: WatingApprovalRes[]) {
     const uniqueUserIds = this.extractUniqueUserIds(approvals);
     const hrUserList = await this.vshr_client.getUserFromId(uniqueUserIds);
 
@@ -66,15 +67,19 @@ export class ApprovalSyncScheduler {
     return hrUserList;
   }
 
-  private extractUniqueUserIds(approvals: any[]): string[] {
+  private extractUniqueUserIds(approvals: Array<WatingApprovalRes>): string[] {
     const approverIds = approvals.flatMap((approval) =>
-      approval.apprLine.map((line: any) => line.approverId),
+      approval.apprLine.map((line) => line.approverId),
     );
     const applicantIds = approvals.map((approval) => approval.applicant);
     return _.uniq([...approverIds, ...applicantIds]);
   }
 
-  private buildRequestDtoList(approvals: any[], hrUsers: any[], config: any): RequestAuto[] {
+  private buildRequestDtoList(
+    approvals: Array<WatingApprovalRes>,
+    hrUsers: Array<UserInfo>,
+    config: LoadedConfig,
+  ): RequestAuto[] {
     return approvals
       .map((approval) => {
         try {
@@ -93,13 +98,18 @@ export class ApprovalSyncScheduler {
       .filter((r) => r != null);
   }
 
-  private buildRequestDto(approval: any, hrUsers: any[], config: any): RequestAuto {
-    const sortedApprLine = approval.apprLine.sort((a: any, b: any) => a.level - b.level);
-    const approverIds = sortedApprLine.map((line: any) => line.approverId);
+  private buildRequestDto(
+    approval: WatingApprovalRes,
+    hrUsers: Array<UserInfo>,
+    config: LoadedConfig,
+  ): RequestAuto {
+    const sortedApprLine = approval.apprLine.sort((a, b) => a.level - b.level);
+    const approverIds = sortedApprLine.map((line) => line.approverId);
 
     const requesterEmpCode = this.findEmpCode(hrUsers, approval.applicant);
     const approvalTypes = this.buildApprovalTypes(approval.applicant, approverIds);
     const approverEmpCodes = this.buildApproverEmpCodes(approverIds, hrUsers);
+    const formEditorData = HtmlContentsBuilder.buildContents(approval);
 
     return {
       APPKEY_01: approval.id,
@@ -110,10 +120,11 @@ export class ApprovalSyncScheduler {
       APPR_SECURITY_TYPE: '0',
       NEXT_APPR_TYPE: approvalTypes.join(';'),
       NEXT_APPROVER: approverEmpCodes,
+      FORM_EDITOR_DATA: formEditorData,
     } as RequestAuto;
   }
 
-  private findEmpCode(hrUsers: any[], userId: string): string {
+  private findEmpCode(hrUsers: Array<UserInfo>, userId: string): string {
     const user = hrUsers.find((u) => u.id.toLowerCase() === userId.toLowerCase());
 
     if (!user) {
@@ -137,7 +148,7 @@ export class ApprovalSyncScheduler {
     return types;
   }
 
-  private buildApproverEmpCodes(approverIds: string[], hrUsers: any[]): string {
+  private buildApproverEmpCodes(approverIds: string[], hrUsers: Array<UserInfo>): string {
     return approverIds.map((id) => this.findEmpCode(hrUsers, id)).join(';');
   }
 }

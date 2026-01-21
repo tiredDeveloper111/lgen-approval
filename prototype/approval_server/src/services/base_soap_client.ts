@@ -1,6 +1,8 @@
 import * as soap from 'soap';
 import * as fs from 'fs';
 import * as path from 'path';
+import winston from 'winston';
+import { Logger } from '../logger_decorator';
 
 export interface SOAPClientConfig {
   wsdlPathOrUrl: string;
@@ -13,6 +15,8 @@ export interface SOAPClientConfig {
  * Base SOAP Client - 모든 SOAP 클라이언트의 공통 로직
  */
 export abstract class BaseSOAPClient<TRequest = any, TResponse = any> {
+  @Logger('SOAPClient')
+  protected logger: winston.Logger;
   protected client: soap.Client | null = null;
   protected config: SOAPClientConfig;
   protected isWsdlUrl: boolean;
@@ -20,8 +24,7 @@ export abstract class BaseSOAPClient<TRequest = any, TResponse = any> {
   constructor(config: SOAPClientConfig) {
     this.config = config;
     this.isWsdlUrl =
-      config.wsdlPathOrUrl.startsWith('http://') ||
-      config.wsdlPathOrUrl.startsWith('https://');
+      config.wsdlPathOrUrl.startsWith('http://') || config.wsdlPathOrUrl.startsWith('https://');
   }
 
   /**
@@ -65,9 +68,9 @@ export abstract class BaseSOAPClient<TRequest = any, TResponse = any> {
         );
       }
 
-      console.log(`[${this.getClientName()}] SOAP 클라이언트가 초기화되었습니다.`);
+      this.logger.info(`Success initialized SOAP client`);
     } catch (error) {
-      console.error(`[${this.getClientName()}] 초기화 중 오류 발생:`, error);
+      this.logger.error(`Fail to initialized SOAP client %s`, error);
       throw error;
     }
   }
@@ -88,12 +91,12 @@ export abstract class BaseSOAPClient<TRequest = any, TResponse = any> {
    */
   describeClient(): void {
     if (!this.client) {
-      console.log('클라이언트가 초기화되지 않았습니다.');
+      this.logger.error('클라이언트가 초기화되지 않았습니다.');
       return;
     }
 
-    console.log(`[${this.getClientName()}] 사용 가능한 서비스:`);
-    console.log(JSON.stringify(this.client.describe(), null, 2));
+    this.logger.info(`사용 가능한 서비스:`);
+    this.logger.info(JSON.stringify(this.client.describe(), null, 2));
   }
 
   /**
@@ -106,4 +109,3 @@ export abstract class BaseSOAPClient<TRequest = any, TResponse = any> {
    */
   abstract execute(request: TRequest): Promise<TResponse>;
 }
-

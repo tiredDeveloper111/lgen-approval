@@ -6,3 +6,4 @@
 /prototype/approval_server/node_modules
 /prototype/.DS_Store
 *.wsdl
+/prototype/approval_server/src/test.ts

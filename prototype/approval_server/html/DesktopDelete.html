@@ -1,0 +1,52 @@
+<div class="block_h3">
+  <h3>신청 정보</h3>
+</div>
+<div class="Approval_1">
+  <table summary="기본정보">
+    <caption></caption>
+    <colgroup>
+      <col style="width: 20%" />
+      <col style="width: 80%" />
+    </colgroup>
+    <tbody>
+      <tr>
+        <th scope="row">신청 종류</th>
+        <td class="last">VD 삭제</td>
+      </tr>
+      <tr>
+        <th scope="row">신청 사유</th>
+        <td class="last">{{REASON}}</td>
+      </tr>
+      <tr>
+        <th scope="row">사용자</th>
+        <td>{{USER}}</td>
+      </tr>
+      <tr>
+        <th scope="row">폐기 Desktop</th>
+        <td class="last">
+          <table>
+            <tbody>
+              <tr>
+                <th scope="col">Desktop 이름</th>
+                <th scope="col">VD그룹</th>
+                <th scope="col">OS</th>
+                <th scope="col">플레이버</th>
+                <th scope="col">Disk</th>
+                <th scope="col" class="last">생성 일시</th>
+              </tr>
+              <tr>
+                <td scope="col">{{DELETE_VD_NAME}}</td>
+                <td scope="col">{{DELETE_VD_GROUP}}</td>
+                <td scope="col">{{DELETE_VD_OS}}</td>
+                <td scope="col">{{DELETE_VD_FLAVOR}}</td>
+                <td scope="col">{{DELETE_VD_DISK}}GB</td>
+                <td scope="col" class="last">{{DELETE_VD_CRETED_AT}}</td>
+              </tr>
+
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -44,7 +44,7 @@ export class ApprovalStatusService {
           throw new Error(`지원하지 않는 API_TYPE: ${request.API_TYPE}`);
       }
     } catch (error) {
-      console.error('처리 중 오류 발생:', error);
+      this.logger.error('Fail to approval request to system: %s', error);
       return {
         IF_STATUS: 'E',
         IF_ERRMSG: error instanceof Error ? error.message : '알 수 없는 오류',
