@@ -15,7 +15,7 @@ import { Logger } from '../logger_decorator';
  * 결재상태 처리 서비스
  */
 export class ApprovalStatusService {
-  @Logger('VSFAccessKeySync')
+  @Logger('ApprovalStatusService')
   private readonly logger: winston.Logger;
   constructor(
     private readonly vshrClient: VshrClient,
@@ -41,7 +41,7 @@ export class ApprovalStatusService {
           return await this.handleApprLineUpdate(request);
 
         default:
-          throw new Error(`지원하지 않는 API_TYPE: ${request.API_TYPE}`);
+          throw new Error(`Not support API_TYPE: ${request.API_TYPE}`);
       }
     } catch (error) {
       this.logger.error('Fail to approval request to system: %s', error);
@@ -60,9 +60,10 @@ export class ApprovalStatusService {
   ): Promise<ApprovalStatusResponse> {
     const userInfo = await this.vshrClient.getUserFromEmpCode(request.APPROVER.split(';'));
 
-    if (!userInfo.success) {
-      throw new Error(`결재자 ${request.APPROVER}의 정보가 존재하지 않습니다.`);
+    if (!userInfo.success || !userInfo.data?.[0]?.id) {
+      throw new Error(`Not exist ${request.APPROVER} in hr system`);
     }
+
     // 위임은 없다고 메일로 확답 받음.
     const [approver] = userInfo.data;
 
@@ -106,23 +107,21 @@ export class ApprovalStatusService {
       request.API_TYPE !== API_TYPE.STATUS_PROCESS &&
       request.API_TYPE !== API_TYPE.APPR_LINE_UPDATE
     ) {
-      throw new Error(`지원하지 않는 API_TYPE: ${request.API_TYPE}`);
+      throw new Error(`Not support API_TYPE: ${request.API_TYPE}`);
     }
 
     // 결재 결과 유효성 검증 (A01의 경우)
     if (request.API_TYPE === API_TYPE.STATUS_PROCESS) {
       const validResults = Object.values(RESULT_TYPE);
       if (!validResults.includes(request.RESULT as RESULT_TYPE)) {
-        throw new Error(`지원하지 않는 RESULT: ${request.RESULT}`);
+        throw new Error(`Not support RESULT: ${request.RESULT}`);
       }
     }
 
     const config = Config.getConfig();
 
     if (request.SYSTEM_ID !== config.system.system_id) {
-      throw new Error(
-        `SYSTEM ID가 일치하지 않습니다: ${config.system.system_id}/${request.SYSTEM_ID}`,
-      );
+      throw new Error(`SYSTEM_ID is not matching: ${config.system.system_id}/${request.SYSTEM_ID}`);
     }
   }
 

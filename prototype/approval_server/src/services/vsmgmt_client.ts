@@ -56,7 +56,11 @@ export class WatingApprovalRes {
   public userName: string; // 사용자 이름
   public userOrganization: string; // 사용자 부서
   public reason: string; // 신청 사유
-  public contents: ResetVdContents | DeleteVdContents | ExternalNetContents | CreateVdContents;
+  public contents:
+    | [ResetVdContents]
+    | [DeleteVdContents]
+    | [ExternalNetContents]
+    | [CreateVdContents];
   public jobScheduleDate: string;
   public apprLine: Array<{ level: number; approverId: string }>;
 }

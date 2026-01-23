@@ -35,7 +35,6 @@ async function main() {
   );
 
   // 클라이언트
-
   const factory = new SOAPClientFactory({
     approvalRegister: {
       wsdlPathOrUrl: config.approval_client.register.wsdl,
@@ -48,7 +47,12 @@ async function main() {
   const registerClient = await factory.getApprovalRegisterClient();
   const scheduler = new ApprovalSyncScheduler(vshrClient, vsmgmtClient, registerClient);
 
-  scheduler.start().catch((e) => logger.error('Unexpected error %s', e.stack || e));
+  scheduler
+    .start()
+    .then(() => {
+      logger.info('Success start scheduler...');
+    })
+    .catch((e) => logger.error('Unexpected error %s', e.stack || e));
 
   await server.start();
 
@@ -67,6 +71,6 @@ async function main() {
 }
 
 main().catch((e) => {
-  logger.error('❌ 서버 시작 중 오류:', e);
+  logger.error('서버 시작 중 오류:', e);
   process.exit(1);
 });

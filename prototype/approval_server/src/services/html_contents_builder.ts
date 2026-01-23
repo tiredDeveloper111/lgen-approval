@@ -34,19 +34,19 @@ export class HtmlContentsBuilder {
     switch (type) {
       case APPROVAL_TYPE.CREATE_VD:
         return process.env.NODE_ENV === 'production'
-          ? '/approval-server/html/DesktopCreate.html'
+          ? '/approval_server/html/DesktopCreate.html'
           : './html/DesktopCreate.html';
       case APPROVAL_TYPE.DELETE_VD:
         return process.env.NODE_ENV === 'production'
-          ? '/approval-server/html/DesktopDelete.html'
+          ? '/approval_server/html/DesktopDelete.html'
           : './html/DesktopDelete.html';
       case APPROVAL_TYPE.RESET_VD:
         return process.env.NODE_ENV === 'production'
-          ? '/approval-server/html/DesktopReset.html'
+          ? '/approval_server/html/DesktopReset.html'
           : './html/DesktopReset.html';
       case APPROVAL_TYPE.ACCESS_EXT_NET:
         return process.env.NODE_ENV === 'production'
-          ? '/approval-server/html/ExternalAccess.html'
+          ? '/approval_server/html/ExternalAccess.html'
           : './html/ExternalAccess.html';
       default:
         throw new Error('Not supported approval type');
@@ -89,7 +89,7 @@ export class HtmlContentsBuilder {
                 <td scope="col" class="last">{{CREATE_DATE}}</td>
               </tr>`;
 
-    const contents = approval.contents as CreateVdContents;
+    const contents = approval.contents[0] as CreateVdContents;
 
     const createVdOwnDesktopContents = contents.ownDesktop
       .map((info) =>
@@ -115,7 +115,7 @@ export class HtmlContentsBuilder {
   }
 
   private static buildDeleteVdContents(approval: WatingApprovalRes, htmlstr: string) {
-    const contents = approval.contents as DeleteVdContents;
+    const contents = approval.contents[0] as DeleteVdContents;
     return htmlstr
       .replace('{{REASON}}', approval.reason)
       .replace('{{USER}}', `${approval.user}/${approval.userName}/${approval.userOrganization}`)
@@ -128,7 +128,8 @@ export class HtmlContentsBuilder {
   }
 
   private static buildResetVdContents(approval: WatingApprovalRes, htmlstr: string) {
-    const contents = approval.contents as DeleteVdContents;
+    const contents = approval.contents[0] as DeleteVdContents;
+
     return htmlstr
       .replace('{{REASON}}', approval.reason)
       .replace('{{USER}}', `${approval.user}/${approval.userName}/${approval.userOrganization}`)
@@ -142,7 +143,7 @@ export class HtmlContentsBuilder {
   }
 
   private static buildAccessExtContents(approval: WatingApprovalRes, htmlstr: string) {
-    const contents = approval.contents as ExternalNetContents;
+    const contents = approval.contents[0] as ExternalNetContents;
     return htmlstr
       .replace('{{REASON}}', approval.reason)
       .replace('{{USER}}', `${approval.user}/${approval.userName}/${approval.userOrganization}`)
