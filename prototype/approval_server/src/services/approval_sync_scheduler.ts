@@ -97,6 +97,20 @@ export class ApprovalSyncScheduler {
       })
       .filter((r) => r != null);
   }
+  private buildTitle(type: string): string {
+    switch (type) {
+      case 'approval.types.create-vd':
+        return `[ESML EnCloud] VD 생성`;
+      case 'approval.types.reset-vd':
+        return `[ESML EnCloud] VD 재설정`;
+      case 'approval.types.delete-vd':
+        return `[ESML EnCloud] VD 삭제`;
+      case 'approval.types.access-from-external-network':
+        return `[ESML EnCloud] 외부망접속 사용신청`;
+      default:
+        throw new Error(`Not supported type ${type}`);
+    }
+  }
 
   private buildRequestDto(
     approval: WatingApprovalRes,
@@ -115,7 +129,7 @@ export class ApprovalSyncScheduler {
       APPKEY_01: approval.id,
       SYSTEM_ID: config.system.system_id,
       FORM_ID: config.system.form_id,
-      APPR_TITLE: approval.type,
+      APPR_TITLE: this.buildTitle(approval.type),
       REQ_USER: requesterEmpCode,
       APPR_SECURITY_TYPE: '0',
       NEXT_APPR_TYPE: approvalTypes.join(';'),
