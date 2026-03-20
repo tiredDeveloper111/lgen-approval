@@ -69,6 +69,4 @@ export interface ApprovalStatusResponse {
 /**
  * SOAP 서비스 메서드 파라미터
  */
-export interface ProcessApprovalStatusArgs {
-  processApprovalStatus: ApprovalStatusRequest;
-}
+export type ProcessApprovalStatusArgs = ApprovalStatusRequest;

@@ -36,7 +36,8 @@ export class SOAPServer {
             this.logger.info('========================================');
 
             try {
-              const request = args.processApprovalStatus;
+              this.logger.info(JSON.stringify(args));
+              const request = args;
               const response = await this.service.processApprovalStatus(request);
 
               this.logger.info('\n응답 데이터:');
