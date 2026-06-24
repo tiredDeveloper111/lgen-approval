@@ -32,10 +32,7 @@ export interface SetEntrustResponse {
  * 전자결재 위임(Delegator) 클라이언트
  * WSDL: LGCY_APRV_EA_TOTALAPRV_06_SO
  */
-export class ApprovalDelegatorClient extends BaseSOAPClient<
-  SetEntrustRequest,
-  SetEntrustResponse
-> {
+export class ApprovalDelegatorClient extends BaseSOAPClient<SetEntrustRequest, SetEntrustResponse> {
   constructor(config: SOAPClientConfig) {
     super(config);
   }
@@ -106,4 +103,3 @@ export class ApprovalDelegatorClient extends BaseSOAPClient<
     });
   }
 }
-

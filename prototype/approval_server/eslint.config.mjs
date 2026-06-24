@@ -5,6 +5,13 @@ import tseslint from 'typescript-eslint';
 
 export default defineConfig([
   {
+    ignores: [
+      '**/app/dist/**/*',
+      '**/node_modules/**/*',
+      '**/logger_config.js',
+    ],
+  },
+  {
     files: ['**/*.{js,mjs,cjs}'],
     plugins: { js },
     extends: ['js/recommended'],
@@ -12,14 +19,6 @@ export default defineConfig([
   },
   ...tseslint.config({
     files: ['**/*.ts', '**/*.tsx'],
-    ignores: [
-      'prototype/approval_client/app/dist/**/*',
-      'prototype/approval_server/app/dist/**/*',
-      'node_modules/**/*',
-      'prototype/approval_client/node_modules/**/*',
-      'prototype/approval_server/node_modules/**/*',
-      './logger_config.js',
-    ],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {

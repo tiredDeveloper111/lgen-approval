@@ -36,7 +36,7 @@ export class ApprovalSyncScheduler {
   }
 
   private async processSyncCycle(config: LoadedConfig) {
-    const approvals = await this.fetchWaitingApprovals(config.approval_client.sync_cycle_min);
+    const approvals = await this.fetchWaitingApprovals();
 
     if (!approvals.length) {
       this.logger.info('Not exist sync approval target');
@@ -44,16 +44,79 @@ export class ApprovalSyncScheduler {
     }
 
     const hrUserList = await this.fetchUserInfoFromHR(approvals);
-    const requestDtoList = this.buildRequestDtoList(approvals, hrUserList.data, config);
 
-    if (requestDtoList.length) {
-      await this.soap_register_client.execute(requestDtoList);
-      this.logger.info('Success send request... list %s', JSON.stringify(requestDtoList));
+    for (const approval of approvals) {
+      await this.syncSingleApproval(approval, hrUserList.data, config);
     }
   }
 
-  private async fetchWaitingApprovals(cycle: number) {
-    return this.vsmgmt_client.getWaitingApprovalByCycle(cycle);
+  private async syncSingleApproval(
+    approval: WatingApprovalRes,
+    hrUsers: Array<UserInfo>,
+    config: LoadedConfig,
+  ): Promise<void> {
+    const syncSuccess = await this.registerToSoap(approval, hrUsers, config);
+    await this.postSyncResultToVsmgmt(approval.id, syncSuccess);
+  }
+
+  private async registerToSoap(
+    approval: WatingApprovalRes,
+    hrUsers: Array<UserInfo>,
+    config: LoadedConfig,
+  ): Promise<boolean> {
+    try {
+      const requestDto = this.buildRequestDto(approval, hrUsers, config);
+      this.logger.info('Sending single SOAP request for approval ID: %s', approval.id);
+
+      const response = await this.soap_register_client.sendSingle(requestDto);
+      const isSuccess = response?.IF_STATUS === 'S';
+
+      if (isSuccess) {
+        this.logger.info(
+          'Success send request to SOAP for approval ID: %s. Response: %s',
+          approval.id,
+          JSON.stringify(response),
+        );
+      } else {
+        this.logger.warn(
+          'Fail to register SOAP for approval ID: %s. Response: %s',
+          approval.id,
+          JSON.stringify(response),
+        );
+      }
+      return isSuccess;
+    } catch (e: any) {
+      this.logger.error(
+        'Error during SOAP registration for approval ID: %s. Error: %s',
+        approval.id,
+        e.stack || e,
+      );
+      return false;
+    }
+  }
+
+  private async postSyncResultToVsmgmt(approvalId: string, syncSuccess: boolean): Promise<void> {
+    try {
+      await this.vsmgmt_client.postSyncResult({
+        approvalId,
+        syncSuccess,
+      });
+      this.logger.info(
+        'Successfully posted sync result to vsmgmt for approval ID: %s with success=%s',
+        approvalId,
+        syncSuccess,
+      );
+    } catch (e: any) {
+      this.logger.error(
+        'Failed to post sync result to vsmgmt for approval ID: %s. Error: %s',
+        approvalId,
+        e.stack || e,
+      );
+    }
+  }
+
+  private async fetchWaitingApprovals() {
+    return this.vsmgmt_client.getWaitingApprovals();
   }
 
   private async fetchUserInfoFromHR(approvals: WatingApprovalRes[]) {
@@ -75,28 +138,6 @@ export class ApprovalSyncScheduler {
     return _.uniq([...approverIds, ...applicantIds]);
   }
 
-  private buildRequestDtoList(
-    approvals: Array<WatingApprovalRes>,
-    hrUsers: Array<UserInfo>,
-    config: LoadedConfig,
-  ): RequestAuto[] {
-    return approvals
-      .map((approval) => {
-        try {
-          const req = this.buildRequestDto(approval, hrUsers, config);
-          return req;
-        } catch (e: any) {
-          this.logger.error(
-            'Fail to build request for soap ... approval: %s, err: %s',
-            JSON.stringify(approval),
-            e.stack || e,
-          );
-
-          return null;
-        }
-      })
-      .filter((r) => r != null);
-  }
   private buildTitle(type: string): string {
     switch (type) {
       case 'approval.types.create-vd':

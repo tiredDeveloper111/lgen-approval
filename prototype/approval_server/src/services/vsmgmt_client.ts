@@ -10,6 +10,11 @@ export class ProcessResultReq {
   public approverName: string;
 }
 
+export class SyncResultReq {
+  public approvalId: string; // 동기화 대상 결재 고유 ID
+  public syncSuccess: boolean; // 동기화 성공 여부
+}
+
 class VdContents {
   vdName: string;
   disk: number; // gb
@@ -62,6 +67,7 @@ export class WatingApprovalRes {
     | [ExternalNetContents]
     | [CreateVdContents];
   public jobScheduleDate: string;
+  public isSyncExternal?: number;
   public apprLine: Array<{ level: number; approverId: string }>;
 }
 
@@ -81,17 +87,29 @@ export class VsmgmtClient {
     }
   }
 
-  public async getWaitingApprovalByCycle(cycle_min: number): Promise<Array<WatingApprovalRes>> {
+  public async getWaitingApprovals(): Promise<Array<WatingApprovalRes>> {
     const vsmgmtConfig = Config.getConfig().vsmgmt;
-    const uri = `/mgmt/api/approval/waiting?beforeMin=${cycle_min}`;
+    const uri = `/mgmt/api/approval/waiting`;
     const url = `http://${vsmgmtConfig.host}:${vsmgmtConfig.port}${uri}`;
 
     const res = await this.axiosWrapper.get<Array<WatingApprovalRes>>(url);
 
     if (res.status !== 200) {
-      throw new Error(`Fail to post process result to vsmgmt`);
+      throw new Error(`Fail to get waiting approvals from vsmgmt`);
     }
 
     return res.data;
+  }
+
+  public async postSyncResult(req: SyncResultReq): Promise<void> {
+    const vsmgmtConfig = Config.getConfig().vsmgmt;
+    const uri = `/mgmt/api/approval/sync-result`;
+    const url = `http://${vsmgmtConfig.host}:${vsmgmtConfig.port}${uri}`;
+
+    const res = await this.axiosWrapper.post(url, req);
+
+    if (res.status !== 200) {
+      throw new Error(`Fail to post sync result to vsmgmt`);
+    }
   }
 }
