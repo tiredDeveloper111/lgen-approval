@@ -1,0 +1,61 @@
+variables:
+  DOCKER_REGISTRY: "docker.lab.somansa.com"
+  IMAGE_NAME: "lgen-approval-server"
+  BUILD_PLATFORM: "linux/amd64"
+
+  TAG_POSTFIX:
+    value: ""
+    description: "추가 이미지 태그 접미사 (선택, 예: hotfix)"
+
+workflow:
+  rules:
+    # GitLab 웹 UI에서 수동으로 트리거할 때만 빌드
+    - if: $CI_PIPELINE_SOURCE == 'web'
+
+stages:
+  - build
+
+.print_info: &print_info
+  - echo "Branch = $CI_COMMIT_BRANCH / Commit = $CI_COMMIT_SHORT_SHA"
+  - docker -v
+
+.build_image: &build_image
+  - |
+    if [[ "$TAG_POSTFIX" != "" ]]; then
+      export FULL_TAG="0.0.0-${CI_JOB_ID}-${TAG_POSTFIX}"
+    else
+      export FULL_TAG="0.0.0-${CI_JOB_ID}"
+    fi
+  # main 브랜치는 루트 경로, 그 외는 dev-test/ 경로
+  - |
+    if [[ "$CI_COMMIT_BRANCH" == "main" ]]; then
+      export FULL_IMAGE_NAME="$DOCKER_REGISTRY/$IMAGE_NAME:$FULL_TAG"
+    else
+      export FULL_IMAGE_NAME="$DOCKER_REGISTRY/dev-test/$IMAGE_NAME:$FULL_TAG"
+    fi
+  - echo "BUILD START >> $FULL_IMAGE_NAME"
+  - docker build --platform=$BUILD_PLATFORM -t $FULL_IMAGE_NAME --no-cache ./prototype/approval_server
+
+.push_image: &push_image
+  - echo "ehzjdlalwl1!" | docker login -u docker $DOCKER_REGISTRY --password-stdin
+  - docker image push $FULL_IMAGE_NAME
+  # main 브랜치 빌드는 latest도 같이 push
+  - |
+    if [[ "$CI_COMMIT_BRANCH" == "main" ]]; then
+      export LATEST_IMAGE="$DOCKER_REGISTRY/$IMAGE_NAME:latest"
+      docker image tag $FULL_IMAGE_NAME $LATEST_IMAGE
+      docker image push $LATEST_IMAGE
+      docker rmi $LATEST_IMAGE
+      echo "latest pushed >> docker pull $LATEST_IMAGE"
+    fi
+  - echo "deploy complete >> docker pull $FULL_IMAGE_NAME"
+  - docker rmi $FULL_IMAGE_NAME
+
+lgen_approval_server_build:
+  stage: build
+  tags:
+    - ubuntu
+  script:
+    - *print_info
+    - *build_image
+    - *push_image
